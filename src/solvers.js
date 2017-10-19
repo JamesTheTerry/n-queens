@@ -153,8 +153,9 @@ window.findNQueensSolution = function(n) {
   console.log('this is the nqueen single solution: ', solution);
   console.log(typeof solution);
   if (solution === 0) {
-    return 0;
-    return new Board(board.rows());
+    // return 0;
+    var emptyBoard = new Board({n: n});
+    return emptyBoard.rows();
   }
   return solution.rows();
 };
