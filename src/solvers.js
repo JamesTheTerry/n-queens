@@ -17,32 +17,85 @@
 
 window.findNRooksSolution = function(n) {
   var solution = undefined; //fixme
-  var board = new Board({n: n});
   
-  var recursive = function(board, row, pieceCount) {
-    var chessboard = new Board(board.rows());
-    if (pieceCount >= n) {
-      if (!chessboard.hasAnyRooksConflicts()) {
-        solution = chessboard;
-        return true;
-      }
-      return;
+  // V1
+  // Not an efficent implementation
+  
+  // var board = new Board({n: n});
+  // var recursive = function(board, row, pieceCount) {
+  //   var chessboard = new Board(board.rows());
+  //   if (pieceCount >= n) {
+  //     if (!chessboard.hasAnyRooksConflicts()) {
+  //       solution = chessboard;
+  //       return true;
+  //     }
+  //     return;
+  //   } else {
+  //     for (var i = 0; i < n; i++) {
+  //       chessboard.togglePiece(row, i);
+  //       row++;
+  //       var validSol = recursive(chessboard, row, pieceCount + 1);
+  //       if (validSol) {
+  //         return true;
+  //       }
+  //       row--;
+  //       chessboard.togglePiece(row, i);
+  //     }
+  //   }
+  //   return;
+  // };
+  
+  // recursive(board, 0, 0);
+  
+  
+  // V2
+  // literally like rock paper scissors
+  // moves is 0 to n-1
+  
+  var smartNoConflicts = function(array) {
+    // turn array into set (set doesn't store duplicates)
+    // returns true if no conflicts
+    // returns false if conflicts
+    var set = new Set(array);
+    if (set.size === array.length) {
+      return true;
     } else {
-      for (var i = 0; i < n; i++) {
-        chessboard.togglePiece(row, i);
-        row++;
-        var validSol = recursive(chessboard, row, pieceCount + 1);
-        if (validSol) {
-          return true;
-        }
-        row--;
-        chessboard.togglePiece(row, i);
-      }
+      return false;
     }
-    return;
   };
   
-  recursive(board, 0, 0);
+  var flatBoardToMatrix = function(array) {
+    var matrixBoard = new Board({n: array.length});
+    matrixBoard = matrixBoard.rows();
+    
+    for (var i = 0; i < array.length; i++) {
+      matrixBoard[i][array[i]] = 1;
+    }
+    
+    return matrixBoard;
+  };
+  
+  var flatBoard = function(piecesLeftToPlace, board) {
+    if (piecesLeftToPlace === 0) {
+      // check to see if it passes
+      if (smartNoConflicts(board) === true) {
+        // set solution to board (will need to calculate it)
+        // return true
+      } else {
+        return false;
+      }
+    } else {
+      for (var i = 0; i < n; i++) {
+        var placement = i;
+        var workingSolution = flatBoard(piecesLeftToPlace - 1, board.concat(placement));
+        
+        if (workingSolution === true) {
+          return true;
+        }
+      }
+    }
+  };
+  
   
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   return solution.rows();
