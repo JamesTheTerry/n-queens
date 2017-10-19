@@ -16,30 +16,55 @@
 //////////////////////////////////////////////////////////////////////////////////
 // These two helper functions are part of V2
 
-window.semiProNoConflictsRooks = function(array) {
-  // this could be better, sets are expensive
-  
-  // turn array into set (set doesn't store duplicates)
-  // returns true if no conflicts
-  // returns false if conflicts
-  var set = new Set(array);
-  if (set.size === array.length) {
-    return true;
-  } else {
-    return false;
-  }
-};
-
-window.smartNoConflictsQueens = function(array) {
+window.smartNoConflictsRooks = function(array) {
   var obj = {};
   for (var i = 0; i < array.length; i++) {
-    if (obj[i] === undefined) {
-      obj[i] = obj[i];
-    } else if (obj[i]) {
+    if (obj[array[i]] === undefined) {
+      obj[array[i]] = array[i];
+    } else {
       return false;
     }
   }
   return true;
+};
+
+window.smartNoConflictsQueens = function(array) {
+  var obj = {};
+
+  for (var i = 0; i < array.length; i++) { 
+    if (array[i + 1] !== undefined) {
+      if (array[i] + 1 === array[i + 1] || array[i] - 1 === array[i + 1]) {
+        return false;
+      }
+    }
+    if (obj[array[i]] === undefined) {
+      obj[array[i]] = array[i];
+    } else {
+      return false;
+    }
+  }
+  // var boardObj = flatBoardToMatrix(array);
+  // console.log('boardObj2', boardObj);
+  
+  var boardObj = new Board({n: array.length});
+  console.log('boardObj', boardObj);
+  for (var i = 0; i < array.length; i++) {
+    boardObj.togglePiece(i, array[i]);
+  }
+  
+  if (boardObj.hasAnyMajorDiagonalConflicts() || boardObj.hasAnyMinorDiagonalConflicts()) {
+    return false;
+  }
+  return true;
+};
+
+window.flatBoardToBoardObj = function(array) {
+  var boardObj = new Board({n: array.length});
+  console.log('boardObj', boardObj);
+  for (var i = 0; i < array.length; i++) {
+    boardObj.togglePiece(i, array[i]);
+  }
+  return boardObj;
 };
 
 window.flatBoardToMatrix = function(array) {
@@ -102,7 +127,7 @@ window.findNRooksSolution = function(n) {
   var flatBoard = function(piecesLeftToPlace, board) {
     if (piecesLeftToPlace === 0) {
       // check to see if it passes
-      if (semiProNoConflictsRooks(board) === true) {
+      if (smartNoConflictsRooks(board) === true) {
         // set solution to board (will need to calculate it)
         // return true
         solution = flatBoardToMatrix(board);
@@ -175,7 +200,7 @@ window.countNRooksSolutions = function(n) {
   var flatBoard = function(piecesLeftToPlace, board) {
     if (piecesLeftToPlace === 0) {
       // check to see if it passes
-      if (semiProNoConflictsRooks(board) === true) {
+      if (smartNoConflictsRooks(board) === true) {
         solutionCount += 1;
       }
       return;
@@ -199,11 +224,9 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = new Board({n: n});
-
-
   //////////////////////////////////////////////////////////////////////////////////
   // START V1
+  // var solution = new Board({n: n});
   // var board = new Board({n: n});
 
   
@@ -231,17 +254,19 @@ window.findNQueensSolution = function(n) {
   // };
   
   // recursive(board, 0, 0);
+  // return solution.rows();
   
   // END V1
   //////////////////////////////////////////////////////////////////////////////////
   
   // V2
   // literally like rock paper scissors
-  
+  var solution = new Board({n: n});
+  solution = solution.rows();
   var flatBoard = function(piecesLeftToPlace, board) {
     if (piecesLeftToPlace === 0) {
       // check to see if it passes
-      if (semiProNoConflictsQueens(board) === true) {
+      if (smartNoConflictsQueens(board) === true) {
         // set solution to board (will need to calculate it)
         // return true
         solution = flatBoardToMatrix(board);
@@ -268,34 +293,73 @@ window.findNQueensSolution = function(n) {
   //////////////////////////////////////////////////////////////////////////////////
   
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
-  return solution.rows();
+  return solution;
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
   var solutionCount = 0;  
-  var board = new Board({n: n});
+  
+  //////////////////////////////////////////////////////////////////////////////////
+  // START V1
+  // var board = new Board({n: n});
 
-  var recursive = function(board, row, pieceCount) {
-    var chessboard = new Board(board.rows());
-    if (pieceCount >= n) {
-      if (!chessboard.hasAnyQueensConflicts()) {
+  // var recursive = function(board, row, pieceCount) {
+  //   var chessboard = new Board(board.rows());
+  //   if (pieceCount >= n) {
+  //     if (!chessboard.hasAnyQueensConflicts()) {
+  //       solutionCount += 1;
+  //     }
+  //     return;
+  //   } else {
+  //     for (var i = 0; i < n; i++) {
+  //       chessboard.togglePiece(row, i);
+  //       row++;
+  //       recursive(chessboard, row, pieceCount + 1);
+  //       row--;
+  //       chessboard.togglePiece(row, i);
+  //     }
+  //   }
+  //   return;
+  // };
+  
+  // recursive(board, 0, 0);
+  
+  // END V1
+  //////////////////////////////////////////////////////////////////////////////////
+  
+  //////////////////////////////////////////////////////////////////////////////////
+  // V2 DOESNT WORK
+  // literally like rock paper scissors
+  
+  var flatBoard = function(piecesLeftToPlace, board) {
+    if (piecesLeftToPlace === 0) {
+      // check to see if it passes
+      if (smartNoConflictsQueens(board) === true) {
+        // console.log(board);
+        var matrix = flatBoardToMatrix(board);
+        for (var x = 0; x < matrix.length; x++) {
+          // console.log(JSON.stringify(matrix[x]));
+        }
+        // console.log('//////////////');
         solutionCount += 1;
       }
       return;
     } else {
       for (var i = 0; i < n; i++) {
-        chessboard.togglePiece(row, i);
-        row++;
-        recursive(chessboard, row, pieceCount + 1);
-        row--;
-        chessboard.togglePiece(row, i);
+        var placement = i;
+        flatBoard(piecesLeftToPlace - 1, board.concat(placement));
       }
     }
-    return;
   };
   
-  recursive(board, 0, 0);
+  flatBoard(n, []);
+  
+  // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+  
+  // END V2
+  //////////////////////////////////////////////////////////////////////////////////
+  
   
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
