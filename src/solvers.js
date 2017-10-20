@@ -16,6 +16,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 // These two helper functions are part of V2
 
+//O(n)
 window.smartNoConflictsRooks = function(array) {
   var obj = {};
   for (var i = 0; i < array.length; i++) {
@@ -28,43 +29,25 @@ window.smartNoConflictsRooks = function(array) {
   return true;
 };
 
+//O(n^2)
 window.smartNoConflictsQueens = function(array) {
   var obj = {};
 
-  for (var i = 0; i < array.length; i++) { 
-    if (array[i + 1] !== undefined) {
-      if (array[i] + 1 === array[i + 1] || array[i] - 1 === array[i + 1]) {
+  for (var i = 0; i < array.length; i++) {
+    for (var j = i + 1; j < array.length; j++) {
+      if (Math.abs(array[i] - array[j]) === (j - i)) {
         return false;
       }
     }
+    
     if (obj[array[i]] === undefined) {
       obj[array[i]] = array[i];
     } else {
       return false;
     }
   }
-  // var boardObj = flatBoardToMatrix(array);
-  // console.log('boardObj2', boardObj);
   
-  var boardObj = new Board({n: array.length});
-  console.log('boardObj', boardObj);
-  for (var i = 0; i < array.length; i++) {
-    boardObj.togglePiece(i, array[i]);
-  }
-  
-  if (boardObj.hasAnyMajorDiagonalConflicts() || boardObj.hasAnyMinorDiagonalConflicts()) {
-    return false;
-  }
   return true;
-};
-
-window.flatBoardToBoardObj = function(array) {
-  var boardObj = new Board({n: array.length});
-  console.log('boardObj', boardObj);
-  for (var i = 0; i < array.length; i++) {
-    boardObj.togglePiece(i, array[i]);
-  }
-  return boardObj;
 };
 
 window.flatBoardToMatrix = function(array) {
@@ -136,6 +119,11 @@ window.findNRooksSolution = function(n) {
         return false;
       }
     } else {
+      if (piecesLeftToPlace < n) {
+        if (smartNoConflictsRooks(board) === false) {
+          return false;
+        }
+      }
       for (var i = 0; i < n; i++) {
         var placement = i;
         var workingSolution = flatBoard(piecesLeftToPlace - 1, board.concat(placement));
@@ -149,7 +137,7 @@ window.findNRooksSolution = function(n) {
   
   flatBoard(n, []);
   
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
+  // console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   
   // END V2
   //////////////////////////////////////////////////////////////////////////////////
@@ -205,6 +193,12 @@ window.countNRooksSolutions = function(n) {
       }
       return;
     } else {
+      if (piecesLeftToPlace < n) {
+        if (smartNoConflictsRooks(board) === false) {
+          return false;
+        }
+      }
+      
       for (var i = 0; i < n; i++) {
         var placement = i;
         flatBoard(piecesLeftToPlace - 1, board.concat(placement));
@@ -275,6 +269,11 @@ window.findNQueensSolution = function(n) {
         return false;
       }
     } else {
+      if (piecesLeftToPlace < n) {
+        if (smartNoConflictsQueens(board) === false) {
+          return false;
+        }
+      }
       for (var i = 0; i < n; i++) {
         var placement = i;
         var workingSolution = flatBoard(piecesLeftToPlace - 1, board.concat(placement));
@@ -292,7 +291,7 @@ window.findNQueensSolution = function(n) {
   // END V2
   //////////////////////////////////////////////////////////////////////////////////
   
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+  // console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
 };
 
@@ -346,6 +345,11 @@ window.countNQueensSolutions = function(n) {
       }
       return;
     } else {
+      if (piecesLeftToPlace < n) {
+        if (smartNoConflictsQueens(board) === false) {
+          return false;
+        }
+      }
       for (var i = 0; i < n; i++) {
         var placement = i;
         flatBoard(piecesLeftToPlace - 1, board.concat(placement));
@@ -361,6 +365,6 @@ window.countNQueensSolutions = function(n) {
   //////////////////////////////////////////////////////////////////////////////////
   
   
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
+  // console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
 };
