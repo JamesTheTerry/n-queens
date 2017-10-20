@@ -18,6 +18,7 @@
 
 //O(n)
 window.smartNoConflictsRooks = function(array) {
+  
   var obj = {};
   for (var i = 0; i < array.length; i++) {
     if (obj[array[i]] === undefined) {
@@ -107,7 +108,7 @@ window.findNRooksSolution = function(n) {
   // V2
   // literally like rock paper scissors
   
-  var flatBoard = function(piecesLeftToPlace, board) {
+  var flatBoard = function(piecesLeftToPlace, board, prevCol) {
     if (piecesLeftToPlace === 0) {
       // check to see if it passes
       if (smartNoConflictsRooks(board) === true) {
@@ -125,11 +126,12 @@ window.findNRooksSolution = function(n) {
         }
       }
       for (var i = 0; i < n; i++) {
-        var placement = i;
-        var workingSolution = flatBoard(piecesLeftToPlace - 1, board.concat(placement));
-        
-        if (workingSolution === true) {
-          return true;
+        if (i !== prevCol) {
+          var workingSolution = flatBoard(piecesLeftToPlace - 1, board.concat(i), i);
+          
+          if (workingSolution === true) {
+            return true;
+          }
         }
       }
     }
@@ -185,7 +187,7 @@ window.countNRooksSolutions = function(n) {
   // V2
   // literally like rock paper scissors
   
-  var flatBoard = function(piecesLeftToPlace, board) {
+  var flatBoard = function(piecesLeftToPlace, board, prevCol) {
     if (piecesLeftToPlace === 0) {
       // check to see if it passes
       if (smartNoConflictsRooks(board) === true) {
@@ -200,14 +202,15 @@ window.countNRooksSolutions = function(n) {
       }
       
       for (var i = 0; i < n; i++) {
-        var placement = i;
-        flatBoard(piecesLeftToPlace - 1, board.concat(placement));
+        if (i !== prevCol) {
+          flatBoard(piecesLeftToPlace - 1, board.concat(i), i);
+        }
       }
     }
   };
   
   flatBoard(n, []);
-  
+
   // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   
   // END V2
@@ -257,7 +260,7 @@ window.findNQueensSolution = function(n) {
   // literally like rock paper scissors
   var solution = new Board({n: n});
   solution = solution.rows();
-  var flatBoard = function(piecesLeftToPlace, board) {
+  var flatBoard = function(piecesLeftToPlace, board, prevCol) {
     if (piecesLeftToPlace === 0) {
       // check to see if it passes
       if (smartNoConflictsQueens(board) === true) {
@@ -275,11 +278,12 @@ window.findNQueensSolution = function(n) {
         }
       }
       for (var i = 0; i < n; i++) {
-        var placement = i;
-        var workingSolution = flatBoard(piecesLeftToPlace - 1, board.concat(placement));
-        
-        if (workingSolution === true) {
-          return true;
+        if (i !== prevCol) {
+          var workingSolution = flatBoard(piecesLeftToPlace - 1, board.concat(i), i);
+          
+          if (workingSolution === true) {
+            return true;
+          }
         }
       }
     }
@@ -331,7 +335,7 @@ window.countNQueensSolutions = function(n) {
   // V2 DOESNT WORK
   // literally like rock paper scissors
   
-  var flatBoard = function(piecesLeftToPlace, board) {
+  var flatBoard = function(piecesLeftToPlace, board, prevCol) {
     if (piecesLeftToPlace === 0) {
       // check to see if it passes
       if (smartNoConflictsQueens(board) === true) {
@@ -351,8 +355,9 @@ window.countNQueensSolutions = function(n) {
         }
       }
       for (var i = 0; i < n; i++) {
-        var placement = i;
-        flatBoard(piecesLeftToPlace - 1, board.concat(placement));
+        if (i !== prevCol) {
+          flatBoard(piecesLeftToPlace - 1, board.concat(i), i);
+        }
       }
     }
   };
